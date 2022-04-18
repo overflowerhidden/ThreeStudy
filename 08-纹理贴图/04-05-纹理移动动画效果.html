@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>纹理移动动画效果</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <script src="http://www.yanhuangxueyuan.com/threejs/examples/js/controls/OrbitControls.js"></script>
+  </head>
+
+  <body>
+    <script>
+      var scene = new THREE.Scene(),
+        camera,
+        renderer = new THREE.WebGLRenderer();
+
+      /**
+       * 创建一个设置重复纹理的管道
+       */
+      var curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-80, -40, 0),
+        new THREE.Vector3(-70, 40, 0),
+        new THREE.Vector3(70, 40, 0),
+        new THREE.Vector3(80, -40, 0),
+      ]);
+      var tubeGeometry = new THREE.TubeGeometry(curve, 100, 0.6, 50, false);
+      var textureLoader = new THREE.TextureLoader();
+      var texture = textureLoader.load("run.jpg");
+      // 设置阵列模式为 RepeatWrapping
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      // 设置x方向的偏移(沿着管道路径方向)，y方向默认1
+      // 等价texture.repeat = new THREE.Vector2(20, 1);
+      texture.repeat.x = 50;
+      var tubeMaterial = new THREE.MeshPhongMaterial({
+        map: texture,
+        transparent: true,
+      });
+      var tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+      scene.add(tube);
+
+      /**
+       * 创建一个半透明管道
+       */
+      var tubeGeometry2 = new THREE.TubeGeometry(curve, 100, 2, 50, false);
+      var tubeMaterial2 = new THREE.MeshPhongMaterial({
+        color: 0x4488ff,
+        transparent: true,
+        opacity: 0.3,
+      });
+      var tube2 = new THREE.Mesh(tubeGeometry2, tubeMaterial2);
+      scene.add(tube2);
+
+      /**
+       * 创建两个立方体
+       */
+      function fun() {
+        var box = new THREE.BoxGeometry(20, 50, 30); //创建一个立方体几何对象
+        var material = new THREE.MeshPhongMaterial({
+          color: 0x0000ff,
+        }); //材质对象
+        var mesh = new THREE.Mesh(box, material); //网格模型对象
+        scene.add(mesh); //网格模型添加到场景中
+        mesh.position.set(-80, -50, 0);
+        var mesh2 = mesh.clone();
+        scene.add(mesh2); //网格模型添加到场景中
+        mesh2.position.set(80, -50, 0);
+      }
+      fun();
+
+      // 坐标系辅助显示
+      var axesHelper = new THREE.AxesHelper(300);
+      scene.add(axesHelper);
+
+      createLight();
+      createCamera();
+      createRenderer();
+
+      // 通过requestAnimationFrame()操作三维场景
+      var controls = new THREE.OrbitControls(camera, renderer.domElement); //创建控件对象
+      function render() {
+        renderer.render(scene, camera); //执行渲染操作
+        requestAnimationFrame(render); //请求再次执行渲染函数render
+
+        // 设置纹理偏移
+        texture.offset.x -= 0.06;
+      }
+      render();
+
+      /**
+       * 正投影相机设置
+       */
+      function createCamera() {
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        var k = width / height; //窗口宽高比
+        var s = 150; //三维场景显示范围控制系数，系数越大，显示的范围越大
+        //创建相机对象
+        camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(200, 300, 200); //设置相机位置
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+      }
+
+      /**
+       * 创建渲染器对象
+       */
+      function createRenderer() {
+        renderer.setSize(window.innerWidth, window.innerHeight); //设置渲染区域尺寸
+        renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+        document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+      }
+
+      /**
+       * 创建光源
+       */
+      function createLight() {
+        //点光源
+        var point = new THREE.PointLight(0xffffff);
+        point.position.set(400, 200, 300); //点光源位置
+        scene.add(point); //点光源添加到场景中
+        //环境光
+        var ambient = new THREE.AmbientLight(0x444444);
+        scene.add(ambient);
+      }
+    </script>
+  </body>
+</html>
