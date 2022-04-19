@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>解析骨骼帧动画数据</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <script src="http://www.yanhuangxueyuan.com/threejs/examples/js/controls/OrbitControls.js"></script>
+  </head>
+
+  <body>
+    <button
+      onclick="handoffAnimation('stand')"
+      type="button"
+      style="position: absolute; top: 0; left: 0; padding: 10px"
+    >
+      站立
+    </button>
+    <button
+      onclick="handoffAnimation('walk')"
+      type="button"
+      style="position: absolute; top: 0; left: 100px; padding: 10px"
+    >
+      走起来
+    </button>
+    <button
+      onclick="handoffAnimation('run')"
+      type="button"
+      style="position: absolute; top: 0; left: 200px; padding: 10px"
+    >
+      跑起来
+    </button>
+    <script>
+      function handoffAnimation(status) {
+        mixer = new THREE.AnimationMixer(SkinnedMesh);
+        let num = 1;
+        if (status == "stand") num = 0;
+        if (status == "walk") num = 3;
+        if (status == "run") num = 1;
+        AnimationAction = mixer.clipAction(
+          SkinnedMesh.geometry.animations[num]
+        );
+        AnimationAction.play();
+      }
+
+      var scene = new THREE.Scene(),
+        camera,
+        renderer = new THREE.WebGLRenderer();
+
+      /**
+       * 加载解析骨骼模型动画
+       */
+      var loader = new THREE.ObjectLoader(); //创建一个加载器
+      var mixer = null; //声明一个混合器变量
+      var SkinnedMesh;
+      loader.load("./static/marine_anims_core.json", function (obj) {
+        // console.log(obj);
+        scene.add(obj); //添加到场景中
+        //从返回对象获得骨骼网格模型
+        SkinnedMesh = obj.children[0];
+        //骨骼网格模型作为参数创建一个混合器
+        mixer = new THREE.AnimationMixer(SkinnedMesh);
+        // 查看骨骼网格模型的帧动画数据
+        // console.log(SkinnedMesh.geometry.animations);
+        // 解析跑步状态对应剪辑对象clip中的关键帧数据
+        var AnimationAction = mixer.clipAction(
+          SkinnedMesh.geometry.animations[3]
+        );
+        // 解析步行状态对应剪辑对象clip中的关键帧数据
+        // var AnimationAction = mixer.clipAction(SkinnedMesh.geometry.animations[3]);
+        AnimationAction.play();
+
+        // 骨骼辅助显示
+        var skeletonHelper = new THREE.SkeletonHelper(SkinnedMesh);
+        scene.add(skeletonHelper);
+      });
+
+      // 坐标系辅助显示
+      var axesHelper = new THREE.AxesHelper(200);
+      scene.add(axesHelper);
+
+      createLight();
+      createCamera();
+      createRenderer();
+
+      // 通过requestAnimationFrame()操作三维场景
+      var controls = new THREE.OrbitControls(camera, renderer.domElement); //创建控件对象
+      // 创建一个时钟对象Clock
+      var clock = new THREE.Clock();
+      function render() {
+        renderer.render(scene, camera); //执行渲染操作
+        requestAnimationFrame(render); //请求再次执行渲染函数render
+        if (mixer !== null) {
+          //clock.getDelta()方法获得两帧的时间间隔
+          // 更新混合器相关的时间
+          mixer.update(clock.getDelta());
+        }
+      }
+      render();
+
+      /**
+       * 正投影相机设置
+       */
+      function createCamera() {
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        var k = width / height; //窗口宽高比
+        var s = 150; //三维场景显示范围控制系数，系数越大，显示的范围越大
+        //创建相机对象
+        camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
+        camera.position.set(200, 300, 200); //设置相机位置
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+      }
+
+      /**
+       * 透视相机
+       */
+      function createPerspectiveCamera() {
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        /**透视投影相机对象*/
+        camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
+        camera.position.set(200, 300, 200); //设置相机位置
+        // camera.position.set(292, 109, 268); //设置相机位置
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+      }
+
+      /**
+       * 创建渲染器对象
+       */
+      function createRenderer() {
+        renderer.setSize(window.innerWidth, window.innerHeight); //设置渲染区域尺寸
+        renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+        document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+      }
+
+      /**
+       * 创建光源
+       */
+      function createLight() {
+        //点光源
+        var point = new THREE.PointLight(0xffffff);
+        point.position.set(400, 200, 300); //点光源位置
+        scene.add(point); //点光源添加到场景中
+        //环境光
+        var ambient = new THREE.AmbientLight(0x444444);
+        scene.add(ambient);
+      }
+    </script>
+  </body>
+</html>
