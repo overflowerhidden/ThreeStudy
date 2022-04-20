@@ -31,7 +31,7 @@
       var mixer = null; //声明一个混合器变量
       var loader = new THREE.FBXLoader(); //创建一个FBX加载器
       loader.load("./static_04/SambaDancing.fbx", function (obj) {
-        // console.log(obj)
+        // console.log(obj);
         scene.add(obj);
         obj.translateY(-80);
         // obj作为参数创建一个混合器，解析播放obj及其子对象包含的动画数据
@@ -43,6 +43,7 @@
         AnimationAction.timeScale = 1; //默认1，可以调节播放速度
         // AnimationAction.loop = THREE.LoopOnce; //不循环播放
         // AnimationAction.clampWhenFinished = true; //暂停在最后一帧播放的状态
+
         AnimationAction.play(); //播放动画
       });
 
