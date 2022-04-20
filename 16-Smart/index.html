@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,minimum-scale=1.0,user-scalable=no"
+    />
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .layer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        background: #000;
+      }
+
+      .color {
+        position: absolute;
+        z-index: 2;
+        color: #fff;
+      }
+      .color div {
+        width: 100px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .color .one {
+        background: #b0aea8;
+      }
+      .color .two {
+        background: #7d0506;
+      }
+      .color .three {
+        background: #0c0c0c;
+      }
+      .color .four {
+        background: #063706;
+      }
+      .color .five {
+        background: #762b22;
+      }
+      .color .six {
+        background: #0a0e14;
+      }
+      /*  */
+    </style>
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <div class="layer">
+      <img src="./images/loading.gif" alt="" />
+    </div>
+    <div class="color">
+      <div class="one" onclick="changeCheshen(0)">胡椒白</div>
+      <div class="two" onclick="changeCheshen(1)">辣椒红</div>
+      <div class="three" onclick="changeCheshen(2)">子夜黑</div>
+      <div class="four" onclick="changeCheshen(3)">英伦绿</div>
+      <div class="five" onclick="changeCheshen(4)">日不落红</div>
+      <div class="six" onclick="changeCheshen(5)">八十度黑</div>
+    </div>
+    <div id="container" style="width: 100%; height: 100%"></div>
+  </body>
+</html>
